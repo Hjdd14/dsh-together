@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Build the client bundle, run the whole suite, and fail on any warning that would
+# make the published artifact differ from what the tests covered.
+jobs:
+  build-and-test:
+    name: build · test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    defaults:
+      run:
+        working-directory: bundles/dsh-together
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Validate the catalog and the client bundle
+        run: node build.mjs --check
+
+      - name: Rebuild the client bundle
+        run: node build.mjs
+
+      - name: Fail if the committed artifact is stale
+        run: |
+          git diff --exit-code -- lib/client.js \
+            || { echo '::error::lib/client.js is out of date — run `node build.mjs` and commit it'; exit 1; }
+
+      - name: Gate state machine and classifier
+        run: node --test test/gate.test.mjs
+
+      - name: No-repeat rotation and persistence
+        run: node --test test/history.test.mjs
+
+      - name: Standalone player pages
+        run: node --test test/play.test.mjs
+
+      - name: Every game follows the api contract
+        run: node --test test/games.smoke.test.mjs
+
+      - name: Behavioural audit (playability, no self-winning)
+        run: node --test test/audit.test.mjs
+
+      - name: The bundle loads the way Harness loads it
+        run: node --test test/bundle.test.mjs
+
+  package:
+    name: package (npm pack)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bundles/dsh-together
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build
+        run: node build.mjs
+      - name: Pack and inspect
+        run: |
+          npm pack --silent > tarball.txt
+          TARBALL=$(cat tarball.txt)
+          echo "packed $TARBALL ($(wc -c < "$TARBALL") bytes)"
+          tar -tzf "$TARBALL" | grep -q '^package/lib/client.js$'
+          tar -tzf "$TARBALL" | grep -q '^package/cordis.patch.yml$'
+          tar -tzf "$TARBALL" | grep -q '^package/index.js$'
+          test "$(tar -tzf "$TARBALL" | grep -c '^package/client-src/games/.*\.js$')" -ge 194
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-tarball
+          path: bundles/dsh-together/*.tgz
+          retention-days: 7

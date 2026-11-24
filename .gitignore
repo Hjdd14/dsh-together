@@ -1,0 +1,85 @@
+# ─── 项目自身产物 / 缓存 ─────────────────────────────────────────────
+# 构建缓存与临时录制（tools/shot.mjs 的中间产物）
+.cache/
+tmp/
+.tmp/
+*.tmp
+*.temp
+
+# ─── 日志与调试输出 ──────────────────────────────────────────────────
+*.log
+logs/
+*.trace
+*.out
+*.err
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 测试/调试时留下的探针文件（插件拦截实验产物）
+gate-test-*.txt
+dsh-together-demo.txt
+*.orig
+*.rej
+*.bak
+*.backup
+*~
+
+# ─── 依赖与构建目录 ─────────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+dist/
+build/
+coverage/
+.nyc_output/
+
+# ─── Python（tools/render.py 及本机虚拟环境）────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv*/
+venv/
+ENV/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# ─── 本机隐私：Harness 运行态、设置、状态文件 ────────────────────────
+# 这些文件里可能有绝对路径、会话 id 与个人设置，绝不入库
+dsh-together.json
+dsh-together.state.json
+*.state.json
+.dsh/
+.dsh-together/
+profile/
+profiles/
+
+# ─── 密钥与凭证 ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+secrets*.json
+credentials*.json
+token*.txt
+*.crt
+!docs/**/*.png
+
+# ─── 编辑器 / 操作系统 ──────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# ─── 本项目不纳入版本管理的历史渲染件（截图已统一放 docs/screenshots）──
+bundles/dsh-together/docs/3d/
