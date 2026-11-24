@@ -2,6 +2,10 @@
 
 <div align="center">
 
+[![CI](https://github.com/Hjdd14/dsh-together/actions/workflows/ci.yml/badge.svg)](https://github.com/Hjdd14/dsh-together/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@hjdd14/dsh-together.svg)](https://www.npmjs.com/package/@hjdd14/dsh-together)
+[![license](https://img.shields.io/npm/l/@hjdd14/dsh-together.svg)](LICENSE)
+
 **每次改文件之前，先玩一局小游戏。**
 
 一个 DeepSeek Harness 插件：Agent 想写文件时，宿主把它按在门口，浏览器里弹出一局小游戏；
@@ -52,11 +56,12 @@
 
 ## 安装
 
-插件以 **bundle** 形式提供（`bundles/dsh-together`，包名 `@hjdd14/dsh-together`）。
+```bash
+# 从 npm 安装（推荐）
+dsh plugin add @hjdd14/dsh-together
 
-```text
-# 在 Harness 里安装（指向这个目录，链接安装，不会复制）
-plugin_manager  install_bundle  D:\path\to\dsh-worktogether!!!\bundles\dsh-together
+# 或从源码目录链接安装
+plugin_manager install_bundle /path/to/dsh-together/bundles/dsh-together
 ```
 
 装好后：
@@ -65,7 +70,7 @@ plugin_manager  install_bundle  D:\path\to\dsh-worktogether!!!\bundles\dsh-toget
 2. **设置 → 工作中小游戏**，确认「启用拦截图游戏」开着、分类勾上、冷却时间按喜好设；
 3. 让 Agent 改任意文件 —— 浮层弹出，过关后它继续。
 
-> 插件自带客户端资源，无需构建步骤；`bundles/dsh-together/lib/client.js` 已经是产物。
+> 插件以 bundle 形式分发（`dsh.bundle.patch` + `dsh.client`），自带构建产物，装完即可用。
 
 ## 设置
 
@@ -214,3 +219,10 @@ docs/screenshots/       README 用的截图
 - 3D 游戏需要 WebGL；没有时显示提示并按一次故障上报（3 次自动放行）。
 - 极少数游戏的机器人复验偏快（弹球闯关、割绳子），真人体验约 15–25 秒；门槛在 catalog 里可调。
 - 不联网、不上传、不采集任何数据；游戏画面与状态全部留在本机。
+
+## 许可
+
+[MIT](LICENSE) © 2026 Hjdd14
+
+截图由 [tools/shot.mjs](tools/shot.mjs) + [tools/render.py](tools/render.py) 从游戏自身的绘制调用离线渲染生成，
+可以随时重新生成：`node tools/shot.mjs <gameId> random 240 shot.json && python tools/render.py shot.json out.png`。
